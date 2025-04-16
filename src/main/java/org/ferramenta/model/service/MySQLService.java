@@ -2,13 +2,23 @@ package org.ferramenta.model.service;
 
 import javax.swing.*;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-public class DBService implements IDBService {
-    private Connection connection;
-    public DBService(Connection connection) {
-        this.connection = connection;
+public class MySQLService extends BaseDBService {
+
+    public MySQLService(Connection connection) {
+        super(connection);
     }
+
+    @Override
+    public Connection getConnection() {
+        return connection;
+    }
+
+    @Override
     public List<String> listarTabelas(String schema) throws SQLException {
         List<String> tabelas = new ArrayList<>();
         DatabaseMetaData metaData = connection.getMetaData();
@@ -19,6 +29,8 @@ public class DBService implements IDBService {
         }
         return tabelas;
     }
+
+    @Override
     public List<String[]> listarDados(String tabela, int limite, int offset) throws SQLException {
         List<String[]> dados = new ArrayList<>();
         String sql = "SELECT * FROM " + tabela + " LIMIT " + limite + " OFFSET " + offset;
@@ -35,6 +47,8 @@ public class DBService implements IDBService {
         }
         return dados;
     }
+
+    @Override
     public String[] listarColunas(String tabela) throws SQLException {
         String sql = "SELECT * FROM " + tabela + " LIMIT 1";
         try (Statement stmt = connection.createStatement();
@@ -48,6 +62,20 @@ public class DBService implements IDBService {
             return colunas;
         }
     }
+
+    @Override
+    public void excluirRegistro(String tabela, String condicao) throws SQLException {
+        String sql = "DELETE FROM " + tabela + " WHERE " + condicao;
+        System.out.println(sql);
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException sqlException) {
+            System.out.println(sqlException.getMessage());
+            JOptionPane.showMessageDialog(null, sqlException.getMessage());
+        }
+    }
+
+    @Override
     public Map<String, Boolean> colunasAutoIncrementadas(String tabela) throws SQLException {
         Map<String, Boolean> autoIncMap = new LinkedHashMap<>();
         String sql = "SELECT * FROM " + tabela + " LIMIT 1";
@@ -60,6 +88,7 @@ public class DBService implements IDBService {
         }
         return autoIncMap;
     }
+    @Override
     public Map<String, Boolean> colunasObrigatorias(String tabela) throws SQLException {
         Map<String, Boolean> obrigatorias = new LinkedHashMap<>();
         DatabaseMetaData metaData = connection.getMetaData();
@@ -72,6 +101,7 @@ public class DBService implements IDBService {
         }
         return obrigatorias;
     }
+    @Override
     public void inserirRegistro(String tabela, Map<String, String> dados) throws SQLException {
         StringBuilder sql = new StringBuilder("INSERT INTO ").append(tabela).append(" (");
         StringBuilder values = new StringBuilder("VALUES (");
@@ -92,24 +122,18 @@ public class DBService implements IDBService {
             stmt.executeUpdate();
         }
     }
+    @Override
     public void editarRegistro(String tabela, Map<String, String> novosDados, String condicaoWhere) throws SQLException {
-        // Monta o início da SQL
         StringBuilder sql = new StringBuilder("UPDATE ").append(tabela).append(" SET ");
         List<String> campos = new ArrayList<>(novosDados.keySet());
-        // Remove o campo "id" se ele estiver, para não atualizar ele
-        campos.remove("id");
-        // Monta os campos a serem atualizados com ?
+        campos.remove("id"); // se não quiser atualizar o id
         for (int i = 0; i < campos.size(); i++) {
             sql.append(campos.get(i)).append(" = ?");
             if (i < campos.size() - 1) {
                 sql.append(", ");
             }
         }
-        // Adiciona o WHERE com a condição recebida
         sql.append(" WHERE ").append(condicaoWhere);
-        System.out.println(condicaoWhere);
-        System.out.println("SQL Gerado: " + sql);
-        // Prepara a execução
         try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             for (int i = 0; i < campos.size(); i++) {
                 stmt.setString(i + 1, novosDados.get(campos.get(i)));
@@ -118,24 +142,6 @@ public class DBService implements IDBService {
         }
     }
 
-    public void excluirRegistro(String tabela, String condicao) throws SQLException {
-        String sql = "DELETE FROM " + tabela + " WHERE " + condicao;
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(sql);
-        }
-    }
-    public int contarRegistros(String tabela) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM " + tabela;
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-        return 0;
-    }
+    // Se necessário, sobrescreva métodos específicos do MySQL aqui
 
-    public Connection getConnection() {
-        return this.connection;
-    }
 }

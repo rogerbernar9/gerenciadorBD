@@ -1,6 +1,7 @@
 package org.ferramenta.view;
 
 import org.ferramenta.model.service.DBService;
+import org.ferramenta.model.service.IDBService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class FormularioRegistro extends JDialog {
-    private final DBService dbService;
+    private final IDBService dbService;
     private final String tabela;
     private final String[] colunas;
     private final String[] dados;
@@ -19,7 +20,7 @@ public class FormularioRegistro extends JDialog {
     private final Map<String, Boolean> autoIncrementados;
     private final Map<String, Boolean> obrigatorios;
 
-    public FormularioRegistro(JFrame parent, DBService dbService, String tabela, String[] colunas, String[] dados, String acao) throws Exception {
+    public FormularioRegistro(JFrame parent, IDBService dbService, String tabela, String[] colunas, String[] dados, String acao) throws Exception {
         super(parent, true);
         this.dbService = dbService;
         this.tabela = tabela;

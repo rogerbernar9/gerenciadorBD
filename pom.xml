@@ -30,6 +30,11 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>3.5.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+        </dependency>
 
     </dependencies>
 </project>

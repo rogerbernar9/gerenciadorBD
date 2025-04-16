@@ -1,6 +1,8 @@
 package org.ferramenta.view;
 
 import org.ferramenta.model.service.DBService;
+import org.ferramenta.model.service.IDBService;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -9,10 +11,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
 public class QueryExecutor extends JDialog {
-    private final DBService dbService;
+    private final IDBService dbService;
     private JTextArea areaSQL = new JTextArea(5, 40);
     private JTable tabelaResultados = new JTable();
-    public QueryExecutor(JFrame parent, DBService dbService) {
+    public QueryExecutor(JFrame parent, IDBService dbService) {
         super(parent, "Executar SQL", true);
         this.dbService = dbService;
         setLayout(new BorderLayout());

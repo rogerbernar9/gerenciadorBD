@@ -3,6 +3,10 @@ package org.ferramenta.view;
 import javax.swing.*;
 
 import org.ferramenta.model.service.DBService;
+import org.ferramenta.model.service.IDBService;
+import org.ferramenta.model.service.MySQLService;
+import org.ferramenta.model.service.PostgresService;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Connection;
@@ -64,21 +68,24 @@ public class LoginView extends JFrame {
         prefs.put("usuario", usuario);
         prefs.put("senha", senha);
         prefs.put("tipoBanco", tipo);
-
-
         String url;
+        Connection conn;
         try {
+            IDBService dbService;
             if ("MySQL".equals(tipo)) {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 url = "jdbc:mysql://" + host + ":" + porta + "/" + banco + "?useSSL=false";
+                conn = DriverManager.getConnection(url, usuario, senha);
+                dbService = new MySQLService(conn);
             } else {
                 Class.forName("org.postgresql.Driver");
                 url = "jdbc:postgresql://" + host + ":" + porta + "/" + banco;
+                conn = DriverManager.getConnection(url, usuario, senha);
+                dbService = new PostgresService(conn);
             }
-            Connection conn = DriverManager.getConnection(url, usuario, senha);
             JOptionPane.showMessageDialog(this, "Conectado com sucesso!");
             dispose();
-            new MainWindow(conn);
+            new MainWindow(dbService);  // Passa o serviço e não mais apenas a conexão
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Erro na conexão: " + ex.getMessage());
             ex.printStackTrace();
