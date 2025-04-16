@@ -19,7 +19,7 @@ public class LoginView extends JFrame {
     private JTextField dbField = new JTextField("meubanco");
     private JTextField userField = new JTextField("root");
     private JPasswordField passField = new JPasswordField("senha");
-    private JComboBox<String> tipoBanco = new JComboBox<>(new String[]{"MySQL"});
+    private JComboBox<String> tipoBanco = new JComboBox<>(new String[]{"MySQL","Pgsql"});
     private JButton conectarButton = new JButton("Conectar");
     private Preferences prefs = Preferences.userNodeForPackage(LoginView.class);
 
